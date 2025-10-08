@@ -1,0 +1,99 @@
+# ===========================================
+# File Server Stack
+# ===========================================
+# Services: File Browser + Ngrok Tunnel
+# Configuration: See .env file for all settings
+
+services:
+  # -------------------------------------------
+  # File Browser (Upload/Download Web UI)
+  # -------------------------------------------
+  # Web-based file manager with upload support
+  # Local: http://localhost:${FILEBROWSER_PORT}
+  # Internet: via ngrok tunnel
+  filebrowser:
+    image: filebrowser/filebrowser:latest
+    container_name: fileserver-filebrowser
+    ports:
+      - "${FILEBROWSER_PORT:-8081}:80"
+    volumes:
+      - ${DATA_DIRECTORY}:/srv
+      - filebrowser-db:/database
+      - ./config/filebrowser.json:/.filebrowser.json
+    environment:
+      - PUID=1000
+      - PGID=1000
+    restart: unless-stopped
+    networks:
+      - fileserver-net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # -------------------------------------------
+  # SMB/Samba Server
+  # -------------------------------------------
+  # Local network file sharing for VLC
+  # Access: smb://localhost/media
+  samba:
+    image: dperson/samba
+    container_name: fileserver-samba
+    ports:
+      - "139:139"
+      - "445:445"
+    environment:
+      - USER=${SMB_USER};${SMB_PASSWORD}
+      - SHARE=movies;/data/movies;yes;no;no;all;media;media;media
+      - PERMISSIONS=0777
+    volumes:
+      - ${DATA_DIRECTORY}/movies:/data/movies
+    restart: unless-stopped
+    networks:
+      - fileserver-net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # -------------------------------------------
+  # Ngrok Tunnel
+  # -------------------------------------------
+  # Internet access for File Browser
+  # Dashboard: http://localhost:${NGROK_DASHBOARD_PORT}
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: fileserver-ngrok
+    command: http --domain=${NGROK_DOMAIN} filebrowser:80
+    ports:
+      - "${NGROK_DASHBOARD_PORT:-4040}:4040"
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    depends_on:
+      filebrowser:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - fileserver-net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# -------------------------------------------
+# Volumes
+# -------------------------------------------
+volumes:
+  filebrowser-db:
+    name: fileserver-filebrowser-db
+
+# -------------------------------------------
+# Networks
+# -------------------------------------------
+networks:
+  fileserver-net:
+    driver: bridge
+    name: fileserver-network

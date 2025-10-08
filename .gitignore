@@ -1,0 +1,53 @@
+# ===========================================
+# File Server - Git Ignore
+# ===========================================
+
+# Environment files (contains sensitive credentials)
+.env
+.env.local
+.env.*.local
+.claude
+
+
+# Docker volumes and data
+volumes/
+data/
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*~
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+.project
+.classpath
+.settings/
+
+# Temporary files
+*.tmp
+*.temp
+tmp/
+temp/
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# System files
+.htpasswd
