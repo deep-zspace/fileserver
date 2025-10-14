@@ -42,7 +42,7 @@ docker compose up -d
 3. **Create File Browser user**:
 ```bash
 docker compose stop filebrowser
-docker compose run --rm filebrowser users add <username> <password> --perm.admin
+docker compose run --rm filebrowser users update <username> <password> --perm.admin
 docker compose start filebrowser
 ```
 
