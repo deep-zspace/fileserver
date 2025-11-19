@@ -15,7 +15,7 @@ services:
     image: filebrowser/filebrowser:latest
     container_name: fileserver-filebrowser
     ports:
-      - "${FILEBROWSER_PORT:-8081}:80"
+      - "0.0.0.0:${FILEBROWSER_PORT:-8081}:80"
     volumes:
       - ${DATA_DIRECTORY}:/srv
       - filebrowser-db:/database
@@ -41,8 +41,8 @@ services:
     image: dperson/samba
     container_name: fileserver-samba
     ports:
-      - "139:139"
-      - "445:445"
+      - "0.0.0.0:139:139"
+      - "0.0.0.0:445:445"
     environment:
       - USER=${SMB_USER};${SMB_PASSWORD}
       - SHARE=movies;/data/movies;yes;no;no;all;media;media;media
