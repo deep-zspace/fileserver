@@ -21,8 +21,8 @@ services:
       - filebrowser-db:/database
       - ./config/filebrowser.json:/.filebrowser.json
     environment:
-      - PUID=1000
-      - PGID=1000
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
     restart: unless-stopped
     networks:
       - fileserver-net
@@ -45,8 +45,10 @@ services:
       - "0.0.0.0:445:445"
     environment:
       - USER=${SMB_USER};${SMB_PASSWORD}
-      - SHARE=movies;/data/movies;yes;no;no;all;media;media;media
+      - SHARE=movies;/data/movies;yes;no;no;all;${USERNAME:-deep};${USERNAME:-deep};${USERNAME:-deep}
       - PERMISSIONS=0777
+      - USERID=${USERID:-1000}
+      - GROUPID=${GROUPID:-1000}
     volumes:
       - ${DATA_DIRECTORY}/movies:/data/movies
     restart: unless-stopped

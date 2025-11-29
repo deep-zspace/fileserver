@@ -41,6 +41,19 @@ SMB_USER=${SMB_USER:-$USER}
 read -sp "Password: " SMB_PASSWORD
 echo ""
 
+echo ""
+echo "Enter user ID (UID) for Docker containers:"
+CURRENT_UID=$(id -u)
+read -p "[default: $CURRENT_UID]: " PUID
+PUID=${PUID:-$CURRENT_UID}
+
+echo ""
+echo "Enter group ID (GID) for Docker containers:"
+CURRENT_GID=$(id -g)
+read -p "[default: $CURRENT_GID]: " PGID
+PGID=${PGID:-$CURRENT_GID}
+echo ""
+
 # Generate .env file
 cat > .env << EOF
 
@@ -72,6 +85,15 @@ cat >> .env << EOF
 # -------------------------------------------
 SMB_USER=$SMB_USER
 SMB_PASSWORD=$SMB_PASSWORD
+
+# -------------------------------------------
+# User/Group IDs (for Docker container permissions)
+# -------------------------------------------
+PUID=$PUID
+PGID=$PGID
+USERNAME=$SMB_USER
+USERID=$PUID
+GROUPID=$PGID
 
 # -------------------------------------------
 # Ports
